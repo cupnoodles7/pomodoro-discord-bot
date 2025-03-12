@@ -4,6 +4,7 @@
 import discord
 import os
 from dotenv import load_dotenv
+from discord.ext import commands
 
 
 load_dotenv()
@@ -11,19 +12,20 @@ load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 
+bot = commands.Bot(command_prefix='!', intents=intents)
 
-client = discord.Client(intents=intents)
+#client = discord.Client(intents=intents)
 
-@client.event
+#@client.event
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print(f'We have logged in as {bot.user}')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
+#@client.event
+@bot.command(name="start", help = "Starts a pomodoro timer")
+async def start_timer(ctx):
+    await ctx.send("LOCK IN KID")
 
-client.run(os.environ['BOT_TOKEN'])
+#client.run(os.environ['BOT_TOKEN'])
+bot.run(os.environ['BOT_TOKEN'])
