@@ -1,4 +1,4 @@
-# This example requires the 'message_content' intent.
+
 
 import asyncio
 import discord
@@ -9,6 +9,9 @@ from discord.ext import commands
 
 
 load_dotenv()
+
+COLOR_HAPPY = 0xaf6df9
+COLOR_DANGER = 0xff8da1
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -28,9 +31,7 @@ async def on_ready():
 #@client.event
 @bot.command(name="start", help = "Starts a pomodoro timer")
 async def start_timer(ctx):
-    
-    start_work_em = discord.Embed(title= "Time to lock in, kid", color = 0xaf6df9 )
-    await ctx.send(embed = start_work_em)
+    await show_message(ctx,"Time to lock in, kid", COLOR_HAPPY)
     
     timer.start()
     while timer.is_running():
@@ -39,16 +40,17 @@ async def start_timer(ctx):
         if timer.get_ticks() >= 10:
             timer.stop()
         
-    
-    start_play_em = discord.Embed(title= "Yay you can dissociate and ruminate now!", color = 0xaf6df9 )
-    await ctx.send(embed = start_play_em)
+    await show_message(ctx,"Yay you can dissociate and ruminate now!", COLOR_HAPPY)
+
+async def show_message(ctx, title, color):
+    start_work_em = discord.Embed(title= title, color = color )
+    await ctx.send(embed = start_work_em)
 
 
     
 @bot.command(name="stop", help = "Stop a pomodoro timer")
 async def stop_timer(ctx): 
-    stop_timer_em = discord.Embed(title= "Timer's stopped!", color = 0xff8da1 )
-    await ctx.send(embed = stop_timer_em)
+    await show_message(ctx,"Timer's stopped!", COLOR_DANGER)
     timer.stop()
     
 @bot.command(name="time", help = "Show current time")
@@ -56,7 +58,7 @@ async def show_time(ctx):
     await ctx.send(f"Current timer status is : {timer.is_running()}")
     await ctx.send(f"Current time is : {timer.get_ticks()}")
     
-@bot.command(name="help2", help = "Show help text")
+@bot.command(name="help", help = "Show help text")
 async def show_help(ctx): 
     help_commands = dict()
     for command in bot.commands:
