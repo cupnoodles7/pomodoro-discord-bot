@@ -1,6 +1,6 @@
 # This example requires the 'message_content' intent.
 
-
+import asyncio
 import discord
 import os
 from dotenv import load_dotenv
@@ -25,7 +25,18 @@ async def on_ready():
 #@client.event
 @bot.command(name="start", help = "Starts a pomodoro timer")
 async def start_timer(ctx):
-    await ctx.send("LOCK IN KID")
+    
+    start_work_em = discord.Embed(title= "Time to lock in, kid", color = 0xaf6df9 )
+    await ctx.send(embed = start_work_em)
+    await asyncio.sleep(5)
+    start_play_em = discord.Embed(title= "Yay you can dissociate and ruminate now!", color = 0xaf6df9 )
+    await ctx.send(embed = start_play_em)
+    
+@bot.command(name="stop", help = "Stop a pomodoro timer")
+async def stop_timer(ctx):
+    
+    stop_timer_em = discord.Embed(title= "Timer's stopped!", color = 0xff8da1 )
+    await ctx.send(embed = stop_timer_em)
 
 #client.run(os.environ['BOT_TOKEN'])
 bot.run(os.environ['BOT_TOKEN'])
