@@ -4,6 +4,7 @@ import asyncio
 import discord
 import os
 from dotenv import load_dotenv
+from timer import Timer
 from discord.ext import commands
 
 
@@ -12,7 +13,9 @@ load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', help_command = None, intents=intents)
+
+timer = Timer()
 
 #client = discord.Client(intents=intents)
 
@@ -28,15 +31,42 @@ async def start_timer(ctx):
     
     start_work_em = discord.Embed(title= "Time to lock in, kid", color = 0xaf6df9 )
     await ctx.send(embed = start_work_em)
-    await asyncio.sleep(5)
+    
+    timer.start()
+    while timer.is_running():
+        await asyncio.sleep(1) #25*60
+        timer.tick()
+        if timer.get_ticks() >= 10:
+            timer.stop()
+        
+    
     start_play_em = discord.Embed(title= "Yay you can dissociate and ruminate now!", color = 0xaf6df9 )
     await ctx.send(embed = start_play_em)
+
+
     
 @bot.command(name="stop", help = "Stop a pomodoro timer")
-async def stop_timer(ctx):
-    
+async def stop_timer(ctx): 
     stop_timer_em = discord.Embed(title= "Timer's stopped!", color = 0xff8da1 )
     await ctx.send(embed = stop_timer_em)
+    timer.stop()
+    
+@bot.command(name="time", help = "Show current time")
+async def show_time(ctx): 
+    await ctx.send(f"Current timer status is : {timer.is_running()}")
+    await ctx.send(f"Current time is : {timer.get_ticks()}")
+    
+@bot.command(name="help2", help = "Show help text")
+async def show_help(ctx): 
+    help_commands = dict()
+    for command in bot.commands:
+        help_commands[command.name] = command.help
+    description = "Bot commands are: {}".format(help_commands)
+    show_help_em = discord.Embed(title= "hi hi, this is Pomo Dorito, your friendly Pomodororo bot! ", description=description, color = 0xff8da1 )
+    await ctx.send(embed = show_help_em)
+    timer.stop()
+    
+    
 
 #client.run(os.environ['BOT_TOKEN'])
 bot.run(os.environ['BOT_TOKEN'])
