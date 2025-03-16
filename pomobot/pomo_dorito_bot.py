@@ -4,7 +4,7 @@ import asyncio
 import discord
 import os
 from dotenv import load_dotenv
-from timer import Timer
+from pomobot.timer import Timer
 from discord.ext import commands
 
 
@@ -37,9 +37,6 @@ async def start_timer(ctx):
     while timer.is_running():
         await asyncio.sleep(1) #25*60
         timer.tick()
-        if timer.get_ticks() >= 10:
-            timer.stop()
-        
     await show_message(ctx,"Yay you can dissociate and ruminate now!", COLOR_HAPPY)
 
 async def show_message(ctx, title, color):
@@ -66,7 +63,6 @@ async def show_help(ctx):
     description = "Bot commands are: {}".format(help_commands)
     show_help_em = discord.Embed(title= "hi hi, this is Pomo Dorito, your friendly Pomodororo bot! ", description=description, color = 0xff8da1 )
     await ctx.send(embed = show_help_em)
-    timer.stop()
     
     
 
