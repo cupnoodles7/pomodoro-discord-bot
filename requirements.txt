@@ -1,0 +1,5 @@
+discord.py
+pylint
+pytest
+coverage
+python-dotenv

@@ -10,7 +10,7 @@ def test_start_initializes_vars_properly():
 
 def test_init_initializes_vars_properly():
     timer = Timer()
-    assert timer.is_running()
+    assert not timer.is_running()
     assert timer.get_ticks() == 0   
     
 def test_tick_increases_ticks():
