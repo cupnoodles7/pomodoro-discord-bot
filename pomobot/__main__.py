@@ -15,5 +15,10 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', help_command = None, intents=intents)
-bot.add_cog(Discordcog(bot))
-bot.run(os.environ['BOT_TOKEN'])
+
+async def main():
+    async with bot:
+        await bot.add_cog(DiscordCog(bot))
+        await bot.start(os.environ['BOT_TOKEN'])
+
+asyncio.run(main())

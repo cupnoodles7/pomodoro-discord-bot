@@ -11,12 +11,13 @@ class Timer:
         self.running = False
         self.status = TimerStatus.INITIALIZED
         self.ticks = 0
-        self.max_ticks = max_ticks #25*60
+        
         
     def get_status(self):
         return self.status
     
-    def start(self):
+    def start(self, max_ticks):
+        self.max_ticks = max_ticks #25*60
         self.status = TimerStatus.RUNNING
         self.ticks = 0
         
