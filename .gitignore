@@ -1,6 +1,11 @@
 .env
-venv/
+.venv/
 __pycache__/
 .coverage
 .htmlcov/
 .vscode
+.pytest_cache/
+
+#sqlite db files
+*.db
+

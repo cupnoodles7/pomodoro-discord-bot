@@ -3,7 +3,9 @@
 import asyncio
 import discord
 import os
+import sqlite3
 from dotenv import load_dotenv
+from datetime import datetime
 from pomobot.timer import Timer, TimerStatus
 from discord.ext import commands
 
@@ -14,7 +16,23 @@ COLOR_DANGER = 0xff8da1
 class DiscordCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.timer = Timer(10)
+        self.timer = Timer()
+        self.db = sqlite3.connect('pomobot.db')
+        self.create_tables()
+
+    def create_tables(self):
+        cur = self.db.cursor()
+        # create table
+        cur.execute('''
+        CREATE TABLE IF NOT EXISTS alarms(
+            id integer PRIMARY KEY AUTOINCREMENT,
+            username text NOT NULL,
+            start_time text NOT NULL,
+            delay text NOT NULL
+            )
+        ''')
+
+        self.db.commit()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -23,21 +41,37 @@ class DiscordCog(commands.Cog):
     @commands.command()
     async def start(self, ctx):
         if self.timer.get_status() == TimerStatus.RUNNING:
-            await self.show_message(ctx, "Chat timer's already running, finish up this session to start again smh my head", COLOR_HAPPY)
+            await self.show_message(ctx, "chat timer's already running, finish up this session to start again smh my head", COLOR_HAPPY)
             return
+
+        # setting time
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+
+        cur = self.db.cursor()
+        cur.execute('''
+        INSERT INTO alarms (username, start_time, delay) VALUES
+        (?,?,?)
+        ''', [str(ctx.author), current_time, '10'])
+        self.db.commit()
+
+        cur = self.db.cursor()
+        for row in cur.execute("SELECT * FROM alarms"):
+            print(row)
+
         await self.show_message(ctx, "LOCK TF IN", COLOR_HAPPY)
         self.timer.start(max_ticks=10)
         while self.timer.get_status() == TimerStatus.RUNNING:
             await asyncio.sleep(1)  # 25*60
             self.timer.tick()
         if self.timer.get_status() == TimerStatus.EXPIRED:
-            await self.show_message(ctx, "Yay you can dissociate and ruminate now!", COLOR_HAPPY)
+            await self.show_message(ctx, "yay you can dissociate and ruminate now ~", COLOR_HAPPY)
             self.timer.start(max_ticks=10)
             while self.timer.get_status() == TimerStatus.RUNNING:
                 await asyncio.sleep(1)  # 25*60
                 self.timer.tick()
             if self.timer.get_status() == TimerStatus.EXPIRED:
-                await self.show_message(ctx, "Break over :(", COLOR_HAPPY)
+                await self.show_message(ctx, "break over :(", COLOR_HAPPY)
 
     async def show_message(self, ctx, title, color):
         start_work_em = discord.Embed(title=title, color=color)
